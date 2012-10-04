@@ -1,0 +1,20 @@
+{
+  "author": "Lucas Ontivero <lucasontivero@gmail.com> (http://geeks.ms/blogs/lontivero)",
+  "name": "matematica",
+  "description": "Web math console",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lontivero/matematica.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "1.6.0",
+    "pegjs": "0.7.0",
+    "should": "1.2.0"
+  },
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
