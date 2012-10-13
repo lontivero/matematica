@@ -8,9 +8,23 @@ String.prototype.supplant = function (o) {
 };
 
 Matematica.compiler.passes.stringifier = function(ast) {
+  function isAssociative(node){
+    var leftType = node.left.type,
+        rightType= node.right.type,
+        type  = node.type,
+        areSameType = leftType === rightType,
+        isScalar = function(t) { return t === 'ConstantExpression' || t === 'FunctionInvocation' },
+        isAdditive = function(t) { return t === 'AdditiveExpression' };
+
+    return isAdditive(type) && (areSameType || (isScalar(leftType) && isAdditive(rightType)) || (isScalar(rightType) && isAdditive(leftType))); 
+  }
 
   function stringifyExp(node){
-    return '({left}) {op} ({right})'.supplant({
+    var template = isAssociative(node)
+      ? '{left} {op} {right}'
+      : '({left}) {op} ({right})';
+
+    return template.supplant({
       op: node.operator,
       left: stringify(node.left),
       right: stringify(node.right)
@@ -22,7 +36,7 @@ Matematica.compiler.passes.stringifier = function(ast) {
   }
 
   function stringifyNegExp(node) { 
-    return '(-{expr})'.supplant({
+    return '-{expr}'.supplant({
       expr: stringify(node.node)
     }); 
   }
@@ -45,7 +59,7 @@ Matematica.compiler.passes.stringifier = function(ast) {
   }
 
   function stringifyFunctionInv(node){
-    var template = '{name}' + (node.parameters.length ? '({parameters} )' : '');
+    var template = '{name}' + (node.parameters.length ? '({parameters})' : '');
     return template.supplant({
       name: node.name,
       parameters: node.parameters.map(stringify).join(', ')  

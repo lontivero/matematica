@@ -50,9 +50,4 @@ suite('Simplify Expressions', function() {
         simplify(additive(functionInvocation('x'), additive(constant(2), constant(3))))
         .should.eql(additive(functionInvocation('x'), constant(5)));
     });
-
-    test('(x + 2) + 3 = x + 5 (NegativeExpression/FunctionInvocation)', function() {
-        simplify(additive(additive(functionInvocation('x'), constant(2)), constant(3)))
-        .should.eql(additive(functionInvocation('x'), constant(5)));
-    });
 });
