@@ -1,5 +1,21 @@
-var Parser = require('./parser');
-debugger;
-var result = Parser.parse('[1 2 3; 4 5 6]');
-console.log(result);
+var Matematica = (function() {
 
+	var Matematica = {
+		VERSION: "@VERSION",
+
+		buildParser: function(code, options) {
+			var ast = Matematica.parser.parse(code),
+				xxx = Matematica.compiler.compile(ast, options);
+		}
+	};
+
+	// @include "parser.js"
+	// @include "compiler.js"
+
+	return Matematica;
+
+})();
+
+if (typeof module !== "undefined") {
+  module.exports = Matematica;
+}	
