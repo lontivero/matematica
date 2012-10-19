@@ -76,7 +76,6 @@ Matematica.parser = (function(){
         "StatementList": parse_StatementList,
         "Statement": parse_Statement,
         "Assignment": parse_Assignment,
-        "ParameterList": parse_ParameterList,
         "Identifier": parse_Identifier,
         "Matrix": parse_Matrix,
         "Vector": parse_Vector,
@@ -1554,10 +1553,7 @@ Matematica.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, head, tail) {
-                return {
-                    type: 'Program',
-                    statements: [head].concat(secondNode(tail)) 
-                };
+                return ast.program([head].concat(secondNode(tail)));
            })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
@@ -1633,73 +1629,8 @@ Matematica.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, lhs, op, rhs) {
-                return {
-                    type: 'Assignment',
-                    left: lhs,
-                    right: rhs
-                };
+                return ast.assignment(lhs, rhs);
             })(pos0, result0[0], result0[1], result0[2]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_ParameterList() {
-        var result0, result1, result2, result3;
-        var pos0, pos1, pos2;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_Identifier();
-        if (result0 !== null) {
-          result1 = [];
-          pos2 = pos;
-          result2 = parse_COMMA();
-          if (result2 !== null) {
-            result3 = parse_Identifier();
-            if (result3 !== null) {
-              result2 = [result2, result3];
-            } else {
-              result2 = null;
-              pos = pos2;
-            }
-          } else {
-            result2 = null;
-            pos = pos2;
-          }
-          while (result2 !== null) {
-            result1.push(result2);
-            pos2 = pos;
-            result2 = parse_COMMA();
-            if (result2 !== null) {
-              result3 = parse_Identifier();
-              if (result3 !== null) {
-                result2 = [result2, result3];
-              } else {
-                result2 = null;
-                pos = pos2;
-              }
-            } else {
-              result2 = null;
-              pos = pos2;
-            }
-          }
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, head, tail) {
-                return [head].concat(secondNode(tail));
-            })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -1812,10 +1743,7 @@ Matematica.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, head, tail) {
-                return { 
-                    type: 'Identifier', 
-                    name: head + tail.join('') 
-                }; 
+                return ast.identifier(head + tail.join('')); 
             })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
@@ -2027,12 +1955,7 @@ Matematica.parser = (function(){
           result0 = (function(offset, head, tail) { 
                 var result = head;
                 for (var i = 0; i < tail.length; i++) {
-                    result = {
-                        type:       'LogicalExpression',
-                        operator:   tail[i][0],
-                        left:       result,
-                        right:      tail[i][1]
-                    };
+                    result = ast.logical(result, tail[i][1], tail[i][0]);
                 }
                 return result; 
             })(pos0, result0[0], result0[1]);
@@ -2080,12 +2003,7 @@ Matematica.parser = (function(){
           result0 = (function(offset, head, tail) {
                 var result = head;
                 for (var i = 0; i < tail.length; i++) {
-                    result = {
-                        type:       'CompararisonExpression',
-                        operator:   tail[i][0],
-                        left:       result,
-                        right:      tail[i][1]
-                    };
+                    result = ast.comparison(result, tail[i][1], tail[i][0]);
                 }
                 return result; 
             })(pos0, result0[0], result0[1]);
@@ -2150,12 +2068,7 @@ Matematica.parser = (function(){
           result0 = (function(offset, head, tail) {
                 var result = head;
                 for (var i = 0; i < tail.length; i++) {
-                    result = {
-                        type:       'AdditiveExpression',
-                        operator:   tail[i][0],
-                        left:       result,
-                        right:      tail[i][1]
-                    };
+                    result = ast.additive(/*left*/result, /*right*/tail[i][1], /*operator*/tail[i][0]);
                 }
                 return result; 
             })(pos0, result0[0], result0[1]);
@@ -2220,12 +2133,7 @@ Matematica.parser = (function(){
           result0 = (function(offset, head, tail) {
                 var result = head;
                 for (var i = 0; i < tail.length; i++) {
-                    result = {
-                        type:       'MultiplicativeExpression',
-                        operator:   tail[i][0],
-                        left:       result,
-                        right:      tail[i][1]
-                    };
+                    result = ast.multiplicative(/*left*/result, /*right*/tail[i][1], /*operator*/tail[i][0]);
                 }
                 return result; 
             })(pos0, result0[0], result0[1]);
@@ -2277,10 +2185,7 @@ Matematica.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, sign, expr) {
-                return sign !== '-' ? expr : { 
-                    type: 'NegativeExpression',
-                    node: expr 
-                };
+                return  sign !== '-' ? expr : ast.negative(expr);
             })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
@@ -2365,10 +2270,7 @@ Matematica.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, digits) {
-                return {
-                    type :  'ConstantExpression',
-                    value:  parseInt(digits.join(""), 10)
-                }; 
+                return ast.constant( parseInt(digits.join(""), 10)); 
             })(pos0, result0);
         }
         if (result0 === null) {
@@ -2418,11 +2320,7 @@ Matematica.parser = (function(){
         }
         if (result0 !== null) {
           result0 = (function(offset, id, parameters) {
-                return {
-                    type:       'FunctionInvocation',
-                    name:       id.name,
-                    parameters: parameters !== '' ? parameters[1] : [] 
-                };
+                return ast.functionInvocation(id.name, parameters !== '' ? parameters[1] : []);
             })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
@@ -2539,6 +2437,7 @@ Matematica.parser = (function(){
       }
       
       
+      var ast = Matematica.ast;
       function secondNode(tail){ 
           var result = [];
           for(var i=0; i<tail.length; i++){

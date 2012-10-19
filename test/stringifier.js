@@ -1,14 +1,16 @@
-var stringify = require('./../lib/matematica.js').compiler.passes.stringifier,
-    nodebuilder = require('./commons.js'),
-    constant = nodebuilder.constant, 
-    identifier = nodebuilder.identifier,
-    functionInvocation = nodebuilder.functionInvocation,
-    assignment = nodebuilder.assignment,
-    additive = nodebuilder.additive,
-    multiplicative = nodebuilder.multiplicative,
-    negative = nodebuilder.negative,
-    program = nodebuilder.program;
- 
+var Matematica = require('./../lib/matematica.js'),
+    stringify = Matematica.compiler.passes.stringifier,
+    parser =  Matematica.parser,
+    parse = parser.parse,
+    constant = Matematica.ast.constant, 
+    identifier = Matematica.ast.identifier,
+    functionInvocation = Matematica.ast.functionInvocation,
+    assignment = Matematica.ast.assignment,
+    additive = Matematica.ast.additive,
+    multiplicative = Matematica.ast.multiplicative,
+    negative = Matematica.ast.negative,
+    program = Matematica.ast.program;
+
 require('should');
 
 suite('Stringify Expressions', function() {
@@ -30,7 +32,7 @@ suite('Stringify Expressions', function() {
 
     test('2 * (4 + 7) = "2 * (4 + 7)"', function() {
         stringify(multiplicative( constant(2), additive( constant(4), constant(7) )))
-        .should.equal( "2 * (4 + 7)" );
+        .should.equal( "(2) * (4 + 7)" );
     });
 
     test('x = "x"', function() {

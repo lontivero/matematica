@@ -13,16 +13,16 @@ Matematica.compiler.passes.stringifier = function(ast) {
         rightType= node.right.type,
         type  = node.type,
         areSameType = leftType === rightType,
-        isScalar = function(t) { return t === 'ConstantExpression' || t === 'FunctionInvocation' },
-        isAdditive = function(t) { return t === 'AdditiveExpression' };
+        isScalar = function(t) { return t === 'ConstantExpression' || t === 'FunctionInvocation'; },
+        isAdditive = function(t) { return t === 'AdditiveExpression'; };
 
     return isAdditive(type) && (areSameType || (isScalar(leftType) && isAdditive(rightType)) || (isScalar(rightType) && isAdditive(leftType))); 
   }
 
   function stringifyExp(node){
-    var template = isAssociative(node)
-      ? '{left} {op} {right}'
-      : '({left}) {op} ({right})';
+    var template = isAssociative(node) ? 
+      '{left} {op} {right}' : 
+      '({left}) {op} ({right})';
 
     return template.supplant({
       op: node.operator,

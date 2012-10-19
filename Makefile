@@ -52,25 +52,6 @@ build: parser
 clean:
 	rm -rf $(LIB_DIR)
 
-# Prepare dstribution files
-dist: build
-	# Node.js
-	mkdir -p $(DIST_DIR)
-	cp -r               \
-	  $(LIB_DIR)        \
-	  $(BIN_DIR)        \
-	  $(EXAMPLES_DIR)   \
-	  $(CHANGELOG_FILE) \
-	  $(LICENSE_FILE)   \
-	  $(README_FILE)    \
-	  $(VERSION_FILE)   \
-	  $(DIST_DIR)
-	$(PP) $(PACKAGE_JSON_SRC_FILE) > $(PACKAGE_JSON_DIST_FILE)
-
-# Remove distribution file (created by "dist")
-distclean:
-	rm -rf $(DIST_DIR)
-
 # Run the spec suite
 test: build
 	$(MOCHA) -R spec -u tdd 

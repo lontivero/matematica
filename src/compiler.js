@@ -1,6 +1,7 @@
 Matematica.compiler = {
 
   passNames: [
+    'function_collector.js',
     'simplifier'/*,
     'interpreter'*/
   ],
@@ -21,5 +22,5 @@ Matematica.compiler = {
     };
   }
 };
-
+// @include "compiler/symtable.js"
 // @include "compiler/passes.js"

@@ -1,4 +1,5 @@
 {
+var ast = Matematica.ast;
 function secondNode(tail){ 
     var result = [];
     for(var i=0; i<tail.length; i++){
@@ -90,10 +91,7 @@ MULTIPLICATIVE_OPS = MUL_OP / DIV_OP
 
 StatementList
    = head:Statement tail:(COLON Statement)* {
-        return {
-            type: 'Program',
-            statements: [head].concat(secondNode(tail)) 
-        };
+        return ast.program([head].concat(secondNode(tail)));
    }
 
 Statement
@@ -102,24 +100,12 @@ Statement
 
 Assignment
     = lhs:Identifier op:ASSIGN_OP rhs:Expression {
-        return {
-            type: 'Assignment',
-            left: lhs,
-            right: rhs
-        };
-    }
-
-ParameterList
-    = head:Identifier tail:(COMMA Identifier)* {
-        return [head].concat(secondNode(tail));
+        return ast.assignment(lhs, rhs);
     }
 
 Identifier "identifier"
   = head:(letter / "_" / "$") tail:(letter / digit / "_" / "$")* __ {
-        return { 
-            type: 'Identifier', 
-            name: head + tail.join('') 
-        }; 
+        return ast.identifier(head + tail.join('')); 
     }
 
 Matrix
@@ -152,12 +138,7 @@ LogicalExp
       tail:(LOGICAL_OPS CompararisonExp)* { 
         var result = head;
         for (var i = 0; i < tail.length; i++) {
-            result = {
-                type:       'LogicalExpression',
-                operator:   tail[i][0],
-                left:       result,
-                right:      tail[i][1]
-            };
+            result = ast.logical(result, tail[i][1], tail[i][0]);
         }
         return result; 
     }
@@ -167,12 +148,7 @@ CompararisonExp
       tail:(COMPARISON_OPS AdditiveExp)? {
         var result = head;
         for (var i = 0; i < tail.length; i++) {
-            result = {
-                type:       'CompararisonExpression',
-                operator:   tail[i][0],
-                left:       result,
-                right:      tail[i][1]
-            };
+            result = ast.comparison(result, tail[i][1], tail[i][0]);
         }
         return result; 
     }
@@ -181,12 +157,7 @@ AdditiveExp
     = head:MultiplicativeExp tail:(ADDITIVE_OPS MultiplicativeExp)* {
         var result = head;
         for (var i = 0; i < tail.length; i++) {
-            result = {
-                type:       'AdditiveExpression',
-                operator:   tail[i][0],
-                left:       result,
-                right:      tail[i][1]
-            };
+            result = ast.additive(/*left*/result, /*right*/tail[i][1], /*operator*/tail[i][0]);
         }
         return result; 
     }
@@ -196,23 +167,14 @@ MultiplicativeExp
       tail:(MULTIPLICATIVE_OPS SimpleFactorExp)* {
         var result = head;
         for (var i = 0; i < tail.length; i++) {
-            result = {
-                type:       'MultiplicativeExpression',
-                operator:   tail[i][0],
-                left:       result,
-                right:      tail[i][1]
-            };
+            result = ast.multiplicative(/*left*/result, /*right*/tail[i][1], /*operator*/tail[i][0]);
         }
         return result; 
     }
 
-
 SimpleFactorExp 
     = sign:('+'/'-')? expr:FactorExp {
-        return sign !== '-' ? expr : { 
-            type: 'NegativeExpression',
-            node: expr 
-        };
+        return  sign !== '-' ? expr : ast.negative(expr);
     }
 
 FactorExp
@@ -223,19 +185,12 @@ FactorExp
 
 Number
     = digits:[0-9]+ {
-        return {
-            type :  'ConstantExpression',
-            value:  parseInt(digits.join(""), 10)
-        }; 
+        return ast.constant( parseInt(digits.join(""), 10)); 
     }
 
 FunctionInvocation
     = id:Identifier parameters:(O_PAR ParameterList C_PAR)? {
-        return {
-            type:       'FunctionInvocation',
-            name:       id.name,
-            parameters: parameters !== '' ? parameters[1] : [] 
-        };
+        return ast.functionInvocation(id.name, parameters !== '' ? parameters[1] : []);
     }
 
 ParameterList
@@ -243,3 +198,4 @@ ParameterList
       tail:(COMMA Expression)* {
         return [head].concat(secondNode(tail));
     }
+

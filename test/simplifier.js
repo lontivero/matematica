@@ -1,14 +1,16 @@
-var simplify = require('./../lib/matematica.js').compiler.passes.simplifier,
-    nodebuilder = require('./commons.js'),
-    constant = nodebuilder.constant, 
-    identifier = nodebuilder.identifier,
-    functionInvocation = nodebuilder.functionInvocation,
-    assignment = nodebuilder.assignment,
-    additive = nodebuilder.additive,
-    multiplicative = nodebuilder.multiplicative,
-    negative = nodebuilder.negative,
-    program = nodebuilder.program;
- 
+var Matematica = require('./../lib/matematica.js'),
+    simplify = Matematica.compiler.passes.simplifier,
+    parser =  Matematica.parser,
+    parse = parser.parse,
+    constant = Matematica.ast.constant, 
+    identifier = Matematica.ast.identifier,
+    functionInvocation = Matematica.ast.functionInvocation,
+    assignment = Matematica.ast.assignment,
+    additive = Matematica.ast.additive,
+    multiplicative = Matematica.ast.multiplicative,
+    negative = Matematica.ast.negative,
+    program = Matematica.ast.program;
+
 require('should');
 
 suite('Simplify Expressions', function() {
@@ -46,8 +48,14 @@ suite('Simplify Expressions', function() {
         .should.eql(negative(functionInvocation('x', [constant(5)])));
     });
 
-    test('x + 2 + 3 = x + 5 (NegativeExpression/FunctionInvocation)', function() {
-        simplify(additive(functionInvocation('x'), additive(constant(2), constant(3))))
+    test('(x + 2) + 3 = x + 5 (NegativeExpression/FunctionInvocation)', function() {
+        simplify(additive(additive(functionInvocation('x'), constant(2)), constant(3)))
         .should.eql(additive(functionInvocation('x'), constant(5)));
     });
+
+    test('x + (2 - 3) = x -1 (NegativeExpression/FunctionInvocation)', function() {
+        simplify(additive(functionInvocation('x'), additive(constant(2), negative(constant(3)))))
+        .should.eql(additive(functionInvocation('x'), constant(-1)));
+    });
+
 });

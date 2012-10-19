@@ -9,6 +9,7 @@ var Matematica = (function() {
 		}
 	};
 
+	// @include "commons.js"
 	// @include "parser.js"
 	// @include "compiler.js"
 
