@@ -1,4 +1,4 @@
-Matematica.ast = (function(){
+module.exports = (function(){
     var me = this;
     function expression(type, operator, left, right){
         return {
@@ -50,6 +50,27 @@ Matematica.ast = (function(){
                 node: node
             };
         },
+		exponential: function(base, exp){
+			return {
+				type: 'ExponentialExpression',
+				base: base,
+				exp: exp
+			};
+		},
+		external: function(name){
+			return {
+				type: 'External',
+				name: name
+			};
+		},
+		matrix: function(n, m, nodes){
+			return {
+				type: 'Matrix',
+				m: m,
+				n: n,
+				elements: nodes
+			};
+		},
         program: function (node){
             return {
                 type: 'Program',

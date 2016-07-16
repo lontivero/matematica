@@ -1,0 +1,23 @@
+<html>
+<head>
+	<script type="text/javascript" src="./jquery-3.0.0.min.js"></script>
+	<script type="text/javascript" src="../lib/matematica-browser.js"></script>
+	<script>
+	var matematica = require('matematica');
+	</script>
+	<script >
+		$(document).ready(function(){
+			$("#evaluate").click(function(){
+				var script = $("#script").val();
+				var result = matematica.run(script);
+				$("#result").val(result);
+			});
+		});
+	</script>
+</head>
+<body>
+<textarea id="script"></textarea>
+<button id="evaluate">Evalualte</button>
+<textarea id="result"></textarea>
+</body>
+</html>

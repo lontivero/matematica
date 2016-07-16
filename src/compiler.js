@@ -1,26 +1,20 @@
-Matematica.compiler = {
+var toStr = require('./compiler/passes/stringifier');
 
-  passNames: [
-    'function_collector.js',
-    'simplifier'/*,
-    'interpreter'*/
-  ],
+var	passes = [
+	require('./compiler/passes/simplifier'),
+	require('./compiler/passes/function_collector'),
+	require('./compiler/passes/interpreter')		
+];
+	
+module.exports = {
+	
+	compile : function (ast, options) {
+		var me = this;
 
-  compile: function(ast, options) {
-    var me = this;
+		passes.forEach(function (pass) {
+			pass(ast, options);
+		});
 
-    me.passNames.forEach(function(passName) {
-      me.passes[passName](ast, options);
-    });
-
-    return ast;
-  },
-
-  buildNodeVisitor: function(functions) {
-    return function(node) {
-        return functions[node.type].apply(null, arguments);
-    };
-  }
+		return toStr(ast);
+	},
 };
-// @include "compiler/symtable.js"
-// @include "compiler/passes.js"

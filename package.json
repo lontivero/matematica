@@ -9,13 +9,21 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "chai": "^3.5.0",
+    "jshint": ">= 0.9.1",
     "mocha": "1.6.0",
     "pegjs": "0.7.0",
-    "should": "1.2.0",
-    "jshint": ">= 0.9.1"
+    "should": "1.2.0"
   },
   "optionalDependencies": {},
   "engines": {
     "node": "*"
+  },
+  "scripts": {
+    "parser": "pegjs ./src/matematica.pegjs ./src/parser.js",
+    "build": "browserify ./src/matematica.js | uglifyjs -cm -o ./lib/matematica.min.js",
+    "watch": "watchify -o ./lib/matematica.dev.js -v -d ./src/matematica.js",
+    "browser": "watchify -v -r ./src/matematica.js:matematica  -o ./lib/matematica-browser.js",
+    "test": "mocha ./tests --recursive --watch"
   }
 }

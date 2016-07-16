@@ -1,5 +1,5 @@
 {
-var ast = Matematica.ast;
+var ast = require('./ast');
 function secondNode(tail){ 
     var result = [];
     for(var i=0; i<tail.length; i++){
@@ -81,6 +81,7 @@ LTE_OP         = __ '<=' __ { return '<='; }
 GTE_OP         = __ '>=' __ { return '>='; }
 ADD_OP         = __ '+' __  { return '+'; }
 MIN_OP         = __ '-' __  { return '-'; }
+EXP_OP         = __ '^' __  { return '^'; }
 
 ASSIGN_OP      = __ '=' __  { return '='; }
 
@@ -90,13 +91,13 @@ ADDITIVE_OPS   = ADD_OP / MIN_OP
 MULTIPLICATIVE_OPS = MUL_OP / DIV_OP
 
 StatementList
-   = head:Statement tail:(COLON Statement)* {
+    = head:Statement tail:(COLON Statement)* {
         return ast.program([head].concat(secondNode(tail)));
-   }
+    }
 
 Statement
-   = expr:Expression !ASSIGN_OP { return expr; }
-   / Assignment  
+    = expr:Expression !ASSIGN_OP { return expr; }
+    / Assignment  
 
 Assignment
     = lhs:Identifier op:ASSIGN_OP rhs:Expression {
@@ -104,19 +105,14 @@ Assignment
     }
 
 Identifier "identifier"
-  = head:(letter / "_" / "$") tail:(letter / digit / "_" / "$")* __ {
+	= head:(letter / "_" / "$") tail:(letter / digit / "_" / "$")* __ {
         return ast.identifier(head + tail.join('')); 
     }
 
 Matrix
     = OS_BRACKET head:Vector tail:(COLON Vector)* CS_BRACKET {
         var nodes = [head].concat(secondNode(tail));
-        return {
-            type:   'Matrix',
-            m:      nodes.length,
-            n:      nodes[0].size,
-            elements: nodes
-        };
+        return ast.matrix(head.size, tail.length+1, nodes);
     } 
 
 Vector
@@ -163,8 +159,8 @@ AdditiveExp
     }
 
 MultiplicativeExp
-    = head:SimpleFactorExp 
-      tail:(MULTIPLICATIVE_OPS SimpleFactorExp)* {
+    = head:ExponentialExp 
+      tail:(MULTIPLICATIVE_OPS ExponentialExp)* {
         var result = head;
         for (var i = 0; i < tail.length; i++) {
             result = ast.multiplicative(/*left*/result, /*right*/tail[i][1], /*operator*/tail[i][0]);
@@ -172,6 +168,16 @@ MultiplicativeExp
         return result; 
     }
 
+ExponentialExp
+	= head:SimpleFactorExp 
+	  tail:(EXP_OP exp:SimpleFactorExp)* {
+        var result = head;
+        for (var i = 0; i < tail.length; i++) {
+            result = ast.exponential(result, tail[i][1], tail[i][0]);
+        }
+        return result; 
+	}
+	
 SimpleFactorExp 
     = sign:('+'/'-')? expr:FactorExp {
         return  sign !== '-' ? expr : ast.negative(expr);

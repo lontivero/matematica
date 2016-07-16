@@ -1,57 +1,59 @@
-var Matematica = require('./../lib/matematica.js'),
-    parser =  Matematica.parser,
-    parse = parser.parse,
-    constant = Matematica.ast.constant, 
-    identifier = Matematica.ast.identifier,
-    functionInvocation = Matematica.ast.functionInvocation,
-    assignment = Matematica.ast.assignment,
-    additive = Matematica.ast.additive,
-    multiplicative = Matematica.ast.multiplicative,
-    negative = Matematica.ast.negative,
-    program = Matematica.ast.program;
- 
+var parser=require('./../src/parser');
+var ast = require('./../src/ast');
+var constant = ast.constant,
+    identifier = ast.identifier,
+    functionInvocation = ast.functionInvocation,
+    assignment = ast.assignment,
+    additive = ast.additive,
+    multiplicative = ast.multiplicative,
+    negative = ast.negative,
+    program = ast.program;
+
+var parse = parser.parse;;
+
+	
 require('should');
 
-suite('Parse Expressions', function() {
-    test('5 (ConstantExpression)', function() {
+describe('Parse Expressions', function() {
+    it('5 (ConstantExpression)', function() {
         parse('5').should.eql(program( constant(5) ));
     });
 
-    test('-5 (NegativeExpression/ConstantExpression)', function() {
+    it('-5 (NegativeExpression/ConstantExpression)', function() {
         parse('-5').should.eql(program( negative(constant(5)) ));
     });
 
-    test('2 + 4 (AdditiveExpression)', function() {
+    it('2 + 4 (AdditiveExpression)', function() {
         parse('2 + 4').should.eql(program( additive(constant(2), constant(4)) ));
     });
 
-    test('2 * (4 + 7) (MultiplicativeExpression/Multiplicative)', function() {
+    it('2 * (4 + 7) (MultiplicativeExpression/Multiplicative)', function() {
         parse('2 * (4 + 7)').should.eql(program( 
             multiplicative( 
                 constant(2), 
                 additive( constant(4), constant(7) ))));
     });
 
-    test('2 * 4 + 7 (MultiplicativeExpression/Multiplicative)', function() {
+    it('2 * 4 + 7 (MultiplicativeExpression/Multiplicative)', function() {
         parse('2 * 4 + 7').should.eql(program(
             additive( 
                 multiplicative(constant(2), constant(4)), 
                 constant(7))));
     });
 
-    test('x (FunctionInvocation)', function() {
+    it('x (FunctionInvocation)', function() {
         parse('x').should.eql(program( functionInvocation('x') ));
     });
 
-    test('-x (NegativeExpression/FunctionInvocation)', function() {
+    it('-x (NegativeExpression/FunctionInvocation)', function() {
         parse('-x').should.eql(program( negative(functionInvocation('x')) ));
     });
 
-    test('-x(5) (NegativeExpression/FunctionInvocation)', function() {
+    it('-x(5) (NegativeExpression/FunctionInvocation)', function() {
         parse('-x(5)').should.eql(program(negative(functionInvocation('x', [constant(5)]))));
     });
 
-    test('a = -7*x + 4 (Assignment)', function() {
+    it('a = -7*x + 4 (Assignment)', function() {
         parse('a = -7*x + 4').should.eql(program(
             assignment(
                 identifier('a'), 
@@ -60,11 +62,11 @@ suite('Parse Expressions', function() {
                     constant(4)))));
     });
 
-    test('x=2; a = -7*x + 4; a   (Assignment)', function() {
+    it('x=2; a = -7*x + 4; a   (Assignment)', function() {
         parse('x=2; a = -7*x + 4; a');
     });
 
-    test('[cos(x) (-sin(x))); sin(x) cos(x)] (Rotation Matrix)', function() {
+    it('[cos(x) (-sin(x))); sin(x) cos(x)] (Rotation Matrix)', function() {
         var node =  {
             type: 'Matrix',
             n: 2, 

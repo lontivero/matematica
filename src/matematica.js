@@ -1,22 +1,12 @@
-var Matematica = (function() {
+var	parser = require('./parser'),
+	compiler = require('./compiler');
+	
+module.exports = {
+	VERSION: "@VERSION",
 
-	var Matematica = {
-		VERSION: "@VERSION",
-
-		buildParser: function(code, options) {
-			var ast = Matematica.parser.parse(code),
-				xxx = Matematica.compiler.compile(ast, options);
-		}
-	};
-
-	// @include "commons.js"
-	// @include "parser.js"
-	// @include "compiler.js"
-
-	return Matematica;
-
-})();
-
-if (typeof module !== "undefined") {
-  module.exports = Matematica;
-}	
+	run: function(code, options) {
+		var ast = parser.parse(code),
+			ast = compiler.compile(ast, options);
+		return ast;
+	}
+};
